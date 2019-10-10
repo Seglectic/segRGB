@@ -93,12 +93,12 @@
 			loadRequest.open("GET", '/savedColors.txt');
 			loadRequest.send();
     
-			// loadRequest.onreadystatechange = (e) => {
-				// if (loadRequest.readyState==4 && loadRequest.status==200){					
+			loadRequest.onreadystatechange = (e) => {
+				if (loadRequest.readyState==4 && loadRequest.status==200){					
 					
 					var colors = loadRequest.responseText.split("\n");												//Split() color into array of entries
 					
-					var colors = ['255 20 100','0 255 0','0 255 0','0 255 0'];
+					// var colors = ['255 20 100','0 255 0','0 255 0','0 255 0'];
 
 					//Sets Data DIV to contents of save Data	
 					var colorList = document.getElementById("colorList");											//Get area on page to print data
@@ -141,15 +141,18 @@
 						var delButtonClick = function(){			
 							var deleteID = this.id;			
 							var table = document.getElementById("colorTable");			
-							table.childNodes[deleteID].innerHTML=""													// Sets innerHTML to null so to preserve cell IDs @-@
-							var newData = "";
-							for(var i=0;i<table.childNodes.length;i++){
-								cContent = table.childNodes[i].textContent.split("X")[0]
-								if(cContent){newData+=cContent+"\n"}
+							// table.deleteRow(deleteID);
+							table.childNodes[deleteID].innerHTML=""						//Removes row contents											// Sets innerHTML to null so to preserve cell IDs @-@
+							var newData = "";											//New Data for server
+							for(var i=0;i<table.childNodes.length;i++){					//Builds new data from table
+								cContent = table.childNodes[i].textContent.split("X")[0];
+								if(cContent){newData+=cContent+"|";}
 							}
+							console.log(newData)
 							var loadRequest = new XMLHttpRequest();													// Send GET to delete entry # from file
 							loadRequest.open("GET", '/colorData?data='+newData);
 							loadRequest.send();
+							// window.location.href = '/colorData?data='+newData;
 						}									
 						delButton.onclick = delButtonClick;									
 						delCell.appendChild(delButton);																//Put delbutton in table row
@@ -158,8 +161,8 @@
 						colorTable.appendChild(colorRow);															//Put all row contents in table
 					}
 				}
-        	// }	
-		// }	
+        	}	
+		}	
 		loadColors();
 		
 	</script>

@@ -253,16 +253,43 @@ void loadColors(){
   load.close();
 }
 
-
+//Delete color at specified ID in savedColors.txt
 void deleteColor(){
-  File savedColors = SPIFFS.open("/savedColors.txt","r");                 // Load save file in read mode
+  String response = "ID to delete: \n";
+  response+=server.arg("id");
+  
+
+  File savedColors = SPIFFS.open("/savedColors.txt","r+");                 // Load save file in read mode
+  
+  int id = server.arg("id").toInt();
+  int lineNum = 0;
+  
+  while(savedColors.available()){
+    if( (savedColors.read() == '\n') && lineNum<id){
+      lineNum++;
+      response+="blep\n";
+    }else{
+      response+=savedColors.readString();
+      break;
+    }
+
+  }
+
   savedColors.close();
+  
+  server.send(200,"text/plain",response);
 }
 
 //Rebuild savedColors.txt when entry is deleted
 void colorData(){
-  String response = "Color data: \n";
+  String response;
   response+=server.arg("data");
+  response.replace("|","\n");
+
+  File save = SPIFFS.open("/savedColors.txt","w");
+  save.print(response);
+  save.close();
+
   server.send(200,"text/plain",response);
 }
 
@@ -302,7 +329,6 @@ void setup() {
   ArduinoOTA.setPassword((const char *)"Seglectique");
 
 
-  
 
   /*******************************
    * 
