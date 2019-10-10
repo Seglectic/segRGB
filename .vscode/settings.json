@@ -1,0 +1,9 @@
+{
+    "terminal.integrated.env.windows": {
+        "PATH": "C:\\Users\\Segger\\.platformio\\penv\\Scripts;C:\\Users\\Segger\\.platformio\\penv;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\Program Files\\Microsoft VS Code\\bin;C:\\Program Files\\PuTTY\\;C:\\Program Files (x86)\\WinSCP\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\nodejs\\;C:\\Program Files\\Git\\cmd;C:\\Users\\Segger\\AppData\\Local\\Programs\\Python\\Python36-32\\Scripts\\;C:\\Users\\Segger\\AppData\\Local\\Programs\\Python\\Python36-32\\;C:\\Users\\Segger\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Program Files\\Microsoft VS Code\\bin;C:\\Users\\Segger\\AppData\\Local\\GitHubDesktop\\bin;C:\\Users\\Segger\\AppData\\Local\\hyper\\app-3.0.2\\resources\\bin;C:\\Users\\Segger\\AppData\\Roaming\\npm;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\Program Files\\Microsoft VS Code\\bin;C:\\Program Files\\PuTTY\\;C:\\Program Files (x86)\\WinSCP\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\nodejs\\;C:\\Program Files\\Git\\cmd;C:\\Users\\Segger\\AppData\\Local\\Programs\\Python\\Python36-32\\Scripts\\;C:\\Users\\Segger\\AppData\\Local\\Programs\\Python\\Python36-32\\;C:\\Users\\Segger\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Program Files\\Microsoft VS Code\\bin;C:\\Users\\Segger\\AppData\\Local\\GitHubDesktop\\bin;C:\\Users\\Segger\\AppData\\Local\\hyper\\app-3.0.2\\resources\\bin;C:\\Users\\Segger\\AppData\\Roaming\\npm",
+        "PLATFORMIO_CALLER": "vscode"
+    },
+    "files.associations": {
+        "memory": "cpp"
+    }
+}

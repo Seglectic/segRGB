@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+
+<!---------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+													
+														Single Page Template														
+			
+														This is a simple single-page template
+														to rapidly spawn Seglectic apps without
+														splitting style sheet and script files.
+																				
+																		-Seglectic Softworks 2019
+ ------------------------------------------------------------------------------------------------------------------------------------------------------------------>
+
+<head>
+
+	<!-- Import color picker -->
+	<script src=/lib/jscolor.js></script>
+
+    <!-- Load JQuery if you want fancy stuff -->
+	<!-- <script src="jquery-3.4.1.min.js"></script> -->
+
+	<!-- Responsive meta tag for mobile -->
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	<title>segSoft RGB</title>	
+</head>
+
+
+
+
+<body>
+	<header>Light Control Panel</header>
+
+	<div id="menuPanel">
+			<button onclick= "window.location.href = '/' "> Home</button>
+			<button > Custom </button>
+			<button onclick= "window.location.href = '/pulse/' " > Pulse   </button>
+			<button onclick= "window.location.href = '/options/'"> Options </button>
+	</div>
+
+
+
+	
+
+	<div id= content>
+			
+		<br>
+		<br>
+		<div id=colorPicker>
+			<input
+				class = 'jscolor {width:500,height:500}'
+				value="6e0fff"
+				id = "clrBtn"
+				onchange="clrSubmit()"
+				readonly
+				>
+			</div>
+
+				<br>
+
+
+				<!-- Save this color to main page? -->
+				<button onclick= "saveColor()" >Save</button> 
+				<br>
+				<br>
+
+				
+				
+
+
+
+                <br>
+
+
+	</div>
+
+
+	<div id=footer>
+		<div id=segText>
+			Seglectic Softworks 2019
+		</div>
+	</div>
+	<!------------------------------------------------------------------------------------------------------------------------------------------------------------ 
+
+														SCRIPT
+
+	-------------------------------------------------------------------------------------------------------------------------------------------------------------->
+	<script>
+		console.log("Seglectic Softworks 2019");
+
+
+
+		
+		
+
+        function saveColor(){
+			var saveRequest = new XMLHttpRequest();									// Create a XMLHTTP request
+			
+			var clr = document.getElementById('clrBtn').style.backgroundColor;		// Gets color and 
+			clr = clr.replace('rgb(','');											//  converts in "r g b" format
+			clr = clr.replace(')','');												//  format for server
+			clr = clr.replace(/,/gi,'');											//  to parse
+			
+			saveRequest.open("GET", '/saveColor?data='+clr);						// Make GET at save URL
+            saveRequest.send();														// Send it
+
+			console.log(clr)
+			saveRequest.onreadystatechange = (e) => {								// Callback for the request to run when state changes
+				if (saveRequest.readyState==4 & saveRequest.status==200){ 			// readyState 4 means request done
+					console.log(saveRequest.responseText)							// responseText contains what server replied
+				}
+            }
+        }
+		
+        function loadData(){   														//Same as saveData()
+			var loadRequest = new XMLHttpRequest();
+			loadRequest.open("GET", '/load');
+            loadRequest.send();
+            
+			loadRequest.onreadystatechange = (e) => {
+				if (loadRequest.readyState==4 && loadRequest.status==200){					
+					console.log(loadRequest.responseText)						//At this point we're done, but we'll do something with the data
+
+					//Sets Data DIV to contents of save Data
+					var saves = loadRequest.responseText.split("\n");			//Split() save into array of entries
+					saveContent = document.getElementById("saveContent");		//Get area on page to print data
+					saveContent.innerHTML = ""; 								// and clear it
+
+					for (let i = 0; i < saves.length; i++) {					// Loop the entries and write them to the page
+						var save = saves[i];
+						saveContent.innerHTML += save+"<br>";
+					}
+				}
+        	}	
+		}
+		
+
+		//Gets color of  jscolor button and sends to server
+		function clrSubmit(){
+			var clr = document.getElementById('clrBtn').style.backgroundColor;
+			clr = clr.replace('rgb(','');
+			clr = clr.replace(')','');
+			clr = clr.replace(/,/gi,'');
+			clr=clr.split(' ');
+			
+			//Map values from x/255 to x/1024
+			for(let i=0; i<clr.length;i++){
+				var c  = parseInt(clr[i]);
+				c = Math.floor((c/255)*1024);
+				c = c.toString();
+				clr[i] = c;
+			}
+
+			var setGet = new XMLHttpRequest();
+			var colorURL = "/set?r="+clr[0]+"&g="+clr[1]+"&b="+clr[2]
+			setGet.open("GET",colorURL);
+			setGet.send();        
+    	};
+
+		
+
+	</script>
+
+</body>
+
+
+
+
+
+
+<!---------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+
+														STYLE
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------>
+
+<style>
+	
+	/***************************** *  Page Header ***********************************/
+
+	header{
+		font-size: 32pt;
+		font-family: Verdana, Geneva, Tahoma, sans-serif;
+		font-weight: bold;
+		background-color: rgba(50,50,50,0.9);
+		width:100%;
+		text-align: center;
+		padding-top:8pt;
+		padding-bottom:10pt;
+		text-shadow:7px 7px #000000;
+		/* Draw groove border under header */
+		border-bottom: 3px #9878f8;  
+		border-bottom-style: groove;
+		border-width: 8px;
+	}
+
+	/**********************************  Body  **************************************/
+	
+	body{
+		font-family: Verdana, Geneva, Tahoma, sans-serif;
+		color:white;
+		/* Gradient BG */
+		background-image: linear-gradient(to bottom right,#9878f8,CornFlowerBlue);
+		background-repeat: no-repeat;
+		background-attachment: fixed;
+		margin: 0;
+		width:100%;
+		min-height: 100%;
+		text-shadow:2px 2px #000000;
+	}
+
+	/************************** Various Element Styles ******************************/
+
+	button {
+		background-color: #604c9c; /* Green */
+		border: none;
+		color: white;
+		padding: 5px 5px;
+		text-align: center;
+		text-decoration: none;
+		display: inline-block;
+		font-size: 16px;
+		box-shadow: 5px 5px rgba(50,50,50,0.9);
+	}
+	
+	button {
+		background-color: #604c9c; /* Green */
+		border: none;
+		color: white;
+		padding: 5px 5px;
+		text-align: center;
+		text-decoration: none;
+		display: inline-block;
+		font-size: 16px;
+		box-shadow: 2px 1px rgba(50,50,50,0.9);
+	}
+
+    input{
+        /* min-height:25px; */
+		height:80px;
+		width:80px;
+        font-size:15pt;
+    }
+
+	#content{
+		max-width:70%;
+		margin: 0 auto;             /* Centers div */
+		text-align: center;
+		left: 50%;
+	}
+
+	#menuPanel{
+		position: relative;
+		padding:5px;
+		text-align: center;
+		margin:0 auto;
+		top:0;
+		left:0;
+		height:10%;
+		width:100%;
+		background-color: rgba(20,20,20,0.3);
+	}
+
+	#footer{
+		margin: auto;
+		position:fixed;
+		height:30pt;
+		bottom: 0px;
+		left:0px;
+		width:100%;	
+		background-color: rgba(3, 3, 3, 0.9);
+		/* Draw groove border above footer */
+		border-top: 3px #9878f8;  
+		border-top-style: dotted;
+		/* border-width: 4px; */
+	}
+
+	/* Footer bottom-right font */
+	#segText{
+		font-size: 8pt;
+		position: absolute;
+		right:0px;
+		bottom:10px;
+		text-align: right;
+		padding-right:5px;
+		text-shadow:3px 3px #000000;
+		
+	}
+
+</style>

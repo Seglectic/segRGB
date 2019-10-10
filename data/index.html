@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+
+<!---------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+													
+														SegRGB Strip Control Page														
+			
+														This is the main page for controlling
+														an RGB LED Light strip. Essentially
+														sends a GET to /set but with fancy
+														color pickers and allows toggling
+														of alarm feature.
+																				
+																		-Seglectic Softworks 2019
+ ------------------------------------------------------------------------------------------------------------------------------------------------------------------>
+
+<head>
+	<!-- Import color picker -->
+	<script src=lib/jscolor.js></script>
+
+    <!-- Load JQuery -->
+	<script src="lib/jquery-3.4.1.min.js"></script>
+
+	<!-- Fancy time picker lib-->
+	<script src="lib/timepicker.js"></script>
+
+	<!-- Responsive meta tag for mobile -->
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	<title>segSoft RGB</title>	
+</head>
+
+
+
+<body>
+	<header>Light Control Panel</header>
+
+	<div id="menuPanel">
+			<button onclick= "$('#alarmPanel').fadeOut(500);$('#savedColors').delay(500).fadeIn(200)" > Home </button>			
+			<button onclick= "$('#savedColors').fadeOut(500);$('#alarmPanel').delay(500).fadeIn(200)" > Alarm </button>
+			<button onclick= "window.location.href = 'customColor/' " > Custom   </button>
+			<button onclick= "window.location.href = '/options/'"> Options </button>
+
+	</div>
+
+	
+	<div id= savedColors>
+		<br>
+		<h2>Saved Colors</h2>
+		<div id=colorList> Save data not loaded </div>
+		<br>
+		<br>
+		<br>
+	</div>
+
+
+	<div id= alarmPanel style="display: none;">
+		<br>
+		<h2>Alarm Lights </h2>
+		<br>
+		<br>
+		<div id="clock"></div>
+		<br>
+	</div>
+
+
+	<div id=footer>
+		<div id=segText>
+			Seglectic Softworks 2019
+		</div>
+	</div>
+	<!------------------------------------------------------------------------------------------------------------------------------------------------------------ 
+
+														SCRIPT
+
+	-------------------------------------------------------------------------------------------------------------------------------------------------------------->
+	<script>
+		console.log("Seglectic Softworks 2019");
+
+		
+		//Sends request to set light strip to color
+		function sendColor(r,g,b){	
+			var sendURL = "/set?r="+r+"&g="+g+"&b="+b;
+			var sendGet = new XMLHttpRequest();
+			sendGet.open("GET",sendURL);
+			sendGet.send();
+			console.log("Sending Request for "+r+ " " +g+ " " +b);
+			
+
+		}
+		
+        function loadColors(get){   											 	//Loads list of custom colors saved to chip
+			var loadRequest = new XMLHttpRequest();
+			loadRequest.open("GET", '/savedColors.txt');
+			loadRequest.send();
+    
+			loadRequest.onreadystatechange = (e) => {
+				if (loadRequest.readyState==4 && loadRequest.status==200){					
+					
+					var colors = loadRequest.responseText.split("\n");												//Split() color into array of entries
+					
+					// var colors = ['255 20 100','0 255 0','0 255 0','0 255 0'];
+
+					//Sets Data DIV to contents of save Data	
+					var colorList = document.getElementById("colorList");											//Get area on page to print data
+					colorList.innerHTML = ""; 																		// and clear it
+
+					//Create table element
+					var colorTable = document.createElement("TABLE");
+					colorTable.id = "colorTable";
+					colorList.appendChild(colorTable);
+
+
+					for (let i = 0; i < colors.length; i++) {														// Loop the entries and write them to the page
+
+						if(colors[i]==""){continue;}																//Skip if entry is empty
+						var colorRow = document.createElement('TR'); 												//Create horizontal row to contain buttons
+
+						/*
+						* 			Create color button  
+						*/						
+						var buttonCell = document.createElement('TD'); 												// Cell to contain the button on table
+						let color = colors[i];
+						var colorButton = document.createElement("DIV");											// Create clickable div to put in table
+						colorButton.innerHTML = color
+						colorButton.id = "colorButton";																// Set id to index of color
+						color = color.split(" ");	
+						colorButton.onclick = ()=>{sendColor(color[0],color[1],color[2]);}							// Send color data to ESP when clicked
+						colorButton.style.backgroundColor = "rgb("+color[0]+","+color[1]+","+color[2]+")";			// Set background of button
+						buttonCell.appendChild(colorButton);														// Put button in table row
+						colorRow.appendChild(buttonCell);															// Put Table Row in Table						
+
+
+						/*
+						* 			Delete Button to remove DIV
+						*/	
+						var delCell = document.createElement('TD'); 												// Cell to contain the button on table
+						var delButton = document.createElement("DIV");												// Create button element
+						delButton.innerHTML = "X";			
+						delButton.className = "deleteButton";			
+						delButton.id = i;																			// Set its id to index in list
+						var delButtonClick = function(){			
+							var deleteID = this.id;			
+							var table = document.getElementById("colorTable");			
+							table.childNodes[deleteID].innerHTML=""													// Sets innerHTML to null so to preserve cell IDs @-@
+							//TODO: Send msg to ESP to delete index.. I think. Fuck.
+						}									
+						delButton.onclick = delButtonClick;									
+						delCell.appendChild(delButton);																//Put delbutton in table row
+						colorRow.appendChild(delCell);																//Put Table Row in Table
+
+						colorTable.appendChild(colorRow);															//Put all row contents in table
+					}
+				}
+        	}	
+		}	
+		loadColors();
+		
+	</script>
+</body>
+
+
+
+
+
+
+<!---------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+
+														STYLE
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------>
+
+<style>
+	
+	/******************************  Page Header ***********************************/
+
+	header{
+		font-size: 32pt;
+		font-family: Verdana, Geneva, Tahoma, sans-serif;
+		font-weight: bold;
+		background-color: rgba(50,50,50,0.9);
+		width:100%;
+		text-align: center;
+		padding-top:8pt;
+		padding-bottom:10pt;
+		text-shadow:7px 7px #000000;
+		/* Draw groove border under header */
+		border-bottom: 3px #9878f8;  
+		border-bottom-style: groove;
+		border-width: 8px;
+	}
+
+	/**********************************  Body  **************************************/
+	
+	body{
+		font-family: Verdana, Geneva, Tahoma, sans-serif;
+		color:white;
+		/* Gradient BG */
+		background-image: linear-gradient(to bottom right,#9878f8,CornFlowerBlue);
+		background-repeat: no-repeat;
+		background-attachment: fixed;
+		margin: 0;
+		width:100%;
+		min-height: 100%;
+		text-shadow:2px 2px #000000;
+	}
+
+	/************************** Various Element Styles ******************************/
+
+	button {
+		background-color: #604c9c; 
+		border: none;
+		color: white;
+		padding: 5px 5px;
+		text-align: center;
+		text-decoration: none;
+		display: inline-block;
+		font-size: 16px;
+		box-shadow: 5px 5px rgba(50,50,50,0.9);
+	}
+	
+	button:hover {
+		background-color: #604c9c;
+		border: none;
+		color: white;
+		padding: 5px 5px;
+		text-align: center;
+		text-decoration: none;
+		display: inline-block;
+		font-size: 16px;
+		box-shadow: 2px 1px rgba(50,50,50,0.9);
+	}
+
+    input{
+        /* min-height:25px; */
+		height:80px;
+		width:80px;
+        font-size:15pt;
+    }
+
+	#alarmPanel{
+		max-width:70%;
+		margin:0 auto;
+		text-align: center;
+		left: 50%;
+	}
+
+	#menuPanel{
+		position: relative;
+		/* padding:5px; */
+		padding-top: 10px;
+		padding-bottom: 10px;
+		text-align: center;
+		margin:0 auto;
+		top:0;
+		left:0;
+		height:10%;
+		width:100%;
+		background-color: rgba(20,20,20,0.3);
+	}
+
+	#footer{
+		margin: auto;
+		position:fixed;
+		height:30pt;
+		bottom: 0px;
+		left:0px;
+		width:100%;	
+		background-color: rgba(50,50,50,0.9);
+		/* Draw groove border above footer */
+		border-top: 3px #9878f8;  
+		border-top-style: dotted;
+		/* border-width: 4px; */
+	}
+
+	/* Footer bottom-right font */
+	#segText{
+		font-size: 7pt;
+		position: absolute;
+		right:0px;
+		bottom:5px;
+		text-align: right;
+		padding-right:5px;
+		text-shadow:3px 3px #000000;
+	}
+
+	#savedColors{
+		max-width:70%;
+		margin: 0 auto;             /* Centers div */
+		text-align: center;
+		left: 50%;
+		z-index:5;
+	}
+
+	table, th, td {
+  		/* border: 1px solid black; */
+		border-spacing: 10pt;
+		width:100%;
+	}
+
+	#colorButton{
+		text-align: center;
+		margin:auto;
+		height:40px;
+		width:100%;
+		position:relative;
+		border-radius: 0px;
+		color:rgba(255,255,255,0.3);
+		z-index: 1;
+		float:left;
+	}
+
+	#colorButton:hover{
+		text-align: center;
+		height:40px;
+		border-radius: 5px;
+	}
+
+	#colorButton:active{
+		text-align: center;
+		height:40px;
+		border-radius: 50px;
+	}
+
+	.deleteButton{
+		color:rgba(255,20,20,0.8);
+		text-align:center;
+		float:right;
+		height:40px;
+		width:40px;
+		/* border-radius: 20px; */
+		background-color: rgba(255,28,14,0.8);
+		z-index: 10;
+		float:left;
+		cursor:pointer;
+	}
+
+	.deleteButton:hover{
+		color:rgba(255,20,20,0.8);
+		text-align:center;
+		float:right;
+		height:40px;
+		width:40px;
+		border-radius: 5px;
+		background-color: rgba(255,28,14,0.8);
+		z-index: 10;
+		float:left;
+	}
+
+	.deleteButton:active{
+		color:rgba(255,20,20,0.8);
+		text-align:center;
+		float:right;
+		height:40px;
+		width:40px;
+		border-radius: 20px;
+		background-color: rgba(255,28,14,0.8);
+		z-index: 10;
+		float:left;
+	}
+
+</style>
