@@ -26,26 +26,30 @@
 	<!-- Responsive meta tag for mobile -->
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	
-	<title>segSoft RGB</title>	
+	<title>Light Control Panel</title>	
 </head>
 
 
 
 <body>
-	<header>Light Control Panel</header>
+	<div id= segHeader>
+		<header>Light Control Panel</header>
 
-	<div id="menuPanel">
-			<button onclick= "$('#alarmPanel').fadeOut(500);$('#savedColors').delay(500).fadeIn(200)" > Home </button>			
-			<button onclick= "$('#savedColors').fadeOut(500);$('#alarmPanel').delay(500).fadeIn(200)" > Alarm </button>
-			<button onclick= "window.location.href = 'customColor/' " > Custom   </button>
-			<button onclick= "window.location.href = '/options/'"> Options </button>
-
+		<div id="menuPanel">
+				<button onclick= "$('#alarmPanel').fadeOut(500);$('#savedColors').delay(500).fadeIn(200)" > Home </button>			
+				<button onclick= "$('#savedColors').fadeOut(500);$('#alarmPanel').delay(500).fadeIn(200)" > Alarm </button>
+				<button onclick= "window.location.href = 'customColor/' " > Custom   </button>
+				<button onclick= "window.location.href = '/options/'"> Options </button>
+		</div>
 	</div>
 
-	
+	<!-- This full-bg div blinks the color set for visual feedback -->
+	<div id=bgFlair></div>
+
 	<div id= savedColors>
 		<br>
-		<h2>Saved Colors</h2>
+		<!--  -->
+		<!-- <h2></h2> -->
 		<div id=colorList> Save data not loaded </div>
 		<br>
 		<br>
@@ -76,19 +80,36 @@
 	<script>
 		console.log("Seglectic Softworks 2019");
 
+
+		// Slide in all the divs
+		$(document).ready(()=>{
+			$("#segHeader").slideDown("FAST")
+			$('#menuPanel').delay(300).slideDown(500);
+			$("#footer").delay(300).slideDown(500);
+			$("#bgFlair").delay(1000).fadeIn(300).fadeOut(600);
+			$("#savedColors").delay(400).slideDown(800)
+			$("#deleteButton").fadeIn();
+		});
+
 		
 		//Sends request to set light strip to color
-		function sendColor(r,g,b){	
+		function sendColor(r,g,b){
+			document.getElementById("bgFlair").style.backgroundColor = `rgba(${r},${g},${b},1)`			
+			r = Math.round((r/255)*1024);
+			g = Math.round((g/255)*1024);
+			b = Math.round((b/255)*1024);
 			var sendURL = "/set?r="+r+"&g="+g+"&b="+b;
 			var sendGet = new XMLHttpRequest();
 			sendGet.open("GET",sendURL);
 			sendGet.send();
-			console.log("Sending Request for "+r+ " " +g+ " " +b);
-			
+			// Blink background
+			$("#bgFlair").fadeIn(300).fadeOut(500);
 
+			console.log("Sending Request for "+r+ " " +g+ " " +b);
 		}
 		
-        function loadColors(get){   											 	//Loads list of custom colors saved to chip
+		//Loads list of custom colors saved to chip
+        function loadColors(get){   											 									
 			var loadRequest = new XMLHttpRequest();
 			loadRequest.open("GET", '/savedColors.txt');
 			loadRequest.send();
@@ -98,7 +119,7 @@
 					
 					var colors = loadRequest.responseText.split("\n");												//Split() color into array of entries
 					
-					// var colors = ['255 20 100','0 255 0','0 255 0','0 255 0'];
+					// var colors = ['255 20 100','0 255 0','80 100 200','0 0 255','120 10 120','120 10 120','120 10 120','120 10 120','120 10 120'];
 
 					//Sets Data DIV to contents of save Data	
 					var colorList = document.getElementById("colorList");											//Get area on page to print data
@@ -109,14 +130,12 @@
 					colorTable.id = "colorTable";
 					colorList.appendChild(colorTable);
 
-
 					for (let i = 0; i < colors.length; i++) {														// Loop the entries and write them to the page
 
 						if(colors[i]==""){continue;}																//Skip if entry is empty
 						var colorRow = document.createElement('TR'); 												//Create horizontal row to contain buttons
-
 						/*
-						* 			Create color button  
+									Create color button  
 						*/						
 						var buttonCell = document.createElement('TD'); 												// Cell to contain the button on table
 						let color = colors[i];
@@ -128,10 +147,8 @@
 						colorButton.style.backgroundColor = "rgb("+color[0]+","+color[1]+","+color[2]+")";			// Set background of button
 						buttonCell.appendChild(colorButton);														// Put button in table row
 						colorRow.appendChild(buttonCell);															// Put Table Row in Table						
-
-
 						/*
-						* 			Delete Button to remove Color
+									Create delete button
 						*/	
 						var delCell = document.createElement('TD'); 												// Cell to contain the button on table
 						var delButton = document.createElement("DIV");												// Create button element
@@ -141,18 +158,15 @@
 						var delButtonClick = function(){			
 							var deleteID = this.id;			
 							var table = document.getElementById("colorTable");			
-							// table.deleteRow(deleteID);
-							table.childNodes[deleteID].innerHTML=""						//Removes row contents											// Sets innerHTML to null so to preserve cell IDs @-@
-							var newData = "";											//New Data for server
-							for(var i=0;i<table.childNodes.length;i++){					//Builds new data from table
+							table.childNodes[deleteID].innerHTML=""												// Sets innerHTML to null so to preserve cell IDs
+							var newData = "";																	// New Data for server
+							for(var i=0;i<table.childNodes.length;i++){											// Builds color data from table to send
 								cContent = table.childNodes[i].textContent.split("X")[0];
 								if(cContent){newData+=cContent+"|";}
 							}
-							console.log(newData)
 							var loadRequest = new XMLHttpRequest();													// Send GET to delete entry # from file
 							loadRequest.open("GET", '/colorData?data='+newData);
 							loadRequest.send();
-							// window.location.href = '/colorData?data='+newData;
 						}									
 						delButton.onclick = delButtonClick;									
 						delCell.appendChild(delButton);																//Put delbutton in table row
@@ -182,6 +196,7 @@
 <style>
 	
 	/******************************  Page Header ***********************************/
+	html{  -webkit-tap-highlight-color:transparent;}
 
 	header{
 		font-size: 32pt;
@@ -199,6 +214,10 @@
 		border-width: 8px;
 	}
 
+	#segHeader{
+		display:none;
+	}
+
 	/**********************************  Body  **************************************/
 	
 	body{
@@ -207,11 +226,11 @@
 		/* Gradient BG */
 		background-image: linear-gradient(to bottom right,#9878f8,CornFlowerBlue);
 		background-repeat: no-repeat;
-		background-attachment: fixed;
 		margin: 0;
 		width:100%;
 		height: 100%;
 		text-shadow:2px 2px #000000;
+		background-attachment:scroll;
 	}
 
 	/************************** Various Element Styles ******************************/
@@ -220,24 +239,69 @@
 		background-color: #604c9c; 
 		border: none;
 		color: white;
-		padding: 5px 5px;
+		padding: 10px 15px;
 		text-align: center;
 		text-decoration: none;
 		display: inline-block;
 		font-size: 16px;
 		box-shadow: 5px 5px rgba(50,50,50,0.9);
+		position: relative;
+		border-radius: 5px;
 	}
 	
 	button:hover {
-		background-color: #604c9c;
-		border: none;
-		color: white;
-		padding: 5px 5px;
+		left: 2px;
+		top: 3px;
+		background-color: #8e70e6; 
+		box-shadow: 1px 1px rgba(50,50,50,0.9);
+	}
+
+	#colorButton{
 		text-align: center;
-		text-decoration: none;
-		display: inline-block;
-		font-size: 16px;
-		box-shadow: 2px 1px rgba(50,50,50,0.9);
+		margin:auto;
+		height:100px;
+		width:100%;
+		position:relative;
+		border-radius: 50px;
+		color:transparent;
+		text-shadow:none;
+		cursor: pointer;
+		float:left;
+		box-shadow: 5px 5px rgba(50,50,50,0.5);
+	}
+
+	#colorButton:hover{
+		left: 1px;
+		top: 1px;
+		box-shadow: 4px 4px rgba(50,50,50,0.5);
+	}
+
+	#colorButton:active{
+		left: 2px;
+		top: 5px;
+		box-shadow: 3px 0px rgba(50,50,50,0.5);
+	}
+
+
+	.deleteButton{
+		color:rgba(20,20,20,0.4);
+		background-color: rgba(255,28,14,0.4);
+		text-shadow:none;
+		position: relative;
+		left:50px;
+		text-align:center;
+		float:right;
+		height:20px;
+		width:20px;
+		border-radius: 10px;
+		float:left;
+		cursor:pointer;
+		box-shadow: 2px 3px;
+	}
+
+	.deleteButton:active{
+		top: 3px;
+		box-shadow: none;
 	}
 
     input{
@@ -263,9 +327,9 @@
 		margin:0 auto;
 		top:0;
 		left:0;
-		height:10%;
 		width:100%;
 		background-color: rgba(20,20,20,0.3);
+		display:none;
 	}
 
 	#footer{
@@ -280,6 +344,7 @@
 		border-top: 3px #9878f8;  
 		border-top-style: dotted;
 		/* border-width: 4px; */
+		display:none;
 	}
 
 	/* Footer bottom-right font */
@@ -299,6 +364,18 @@
 		text-align: center;
 		left: 50%;
 		z-index:5;
+		display:none;
+	}
+
+	#bgFlair{
+		z-index: -1;
+		background-color: rgba(255,255,255,0.5);
+		display: none;
+		width:100%;
+		height:100%;
+		position: fixed;
+		top:0;
+		left:0;
 	}
 
 	table, th, td {
@@ -306,66 +383,5 @@
 		border-spacing: 10pt;
 		width:100%;
 	}
-
-	#colorButton{
-		text-align: center;
-		margin:auto;
-		height:40px;
-		width:100%;
-		position:relative;
-		border-radius: 0px;
-		color:rgba(255,255,255,0.3);
-		z-index: 1;
-		float:left;
-	}
-
-	#colorButton:hover{
-		text-align: center;
-		height:40px;
-		border-radius: 5px;
-	}
-
-	#colorButton:active{
-		text-align: center;
-		height:40px;
-		border-radius: 50px;
-	}
-
-	.deleteButton{
-		color:rgba(255,20,20,0.8);
-		text-align:center;
-		float:right;
-		height:40px;
-		width:40px;
-		/* border-radius: 20px; */
-		background-color: rgba(255,28,14,0.8);
-		z-index: 10;
-		float:left;
-		cursor:pointer;
-	}
-
-	.deleteButton:hover{
-		color:rgba(255,20,20,0.8);
-		text-align:center;
-		float:right;
-		height:40px;
-		width:40px;
-		border-radius: 5px;
-		background-color: rgba(255,28,14,0.8);
-		z-index: 10;
-		float:left;
-	}
-
-	.deleteButton:active{
-		color:rgba(255,20,20,0.8);
-		text-align:center;
-		float:right;
-		height:40px;
-		width:40px;
-		border-radius: 20px;
-		background-color: rgba(255,28,14,0.8);
-		z-index: 10;
-		float:left;
-	}
-
+	
 </style>
