@@ -93,12 +93,12 @@
 			loadRequest.open("GET", '/savedColors.txt');
 			loadRequest.send();
     
-			loadRequest.onreadystatechange = (e) => {
-				if (loadRequest.readyState==4 && loadRequest.status==200){					
+			// loadRequest.onreadystatechange = (e) => {
+				// if (loadRequest.readyState==4 && loadRequest.status==200){					
 					
 					var colors = loadRequest.responseText.split("\n");												//Split() color into array of entries
 					
-					// var colors = ['255 20 100','0 255 0','0 255 0','0 255 0'];
+					var colors = ['255 20 100','0 255 0','0 255 0','0 255 0'];
 
 					//Sets Data DIV to contents of save Data	
 					var colorList = document.getElementById("colorList");											//Get area on page to print data
@@ -131,7 +131,7 @@
 
 
 						/*
-						* 			Delete Button to remove DIV
+						* 			Delete Button to remove Color
 						*/	
 						var delCell = document.createElement('TD'); 												// Cell to contain the button on table
 						var delButton = document.createElement("DIV");												// Create button element
@@ -142,7 +142,14 @@
 							var deleteID = this.id;			
 							var table = document.getElementById("colorTable");			
 							table.childNodes[deleteID].innerHTML=""													// Sets innerHTML to null so to preserve cell IDs @-@
-							//TODO: Send msg to ESP to delete index.. I think. Fuck.
+							var newData = "";
+							for(var i=0;i<table.childNodes.length;i++){
+								cContent = table.childNodes[i].textContent.split("X")[0]
+								if(cContent){newData+=cContent+"\n"}
+							}
+							var loadRequest = new XMLHttpRequest();													// Send GET to delete entry # from file
+							loadRequest.open("GET", '/colorData?data='+newData);
+							loadRequest.send();
 						}									
 						delButton.onclick = delButtonClick;									
 						delCell.appendChild(delButton);																//Put delbutton in table row
@@ -151,8 +158,8 @@
 						colorTable.appendChild(colorRow);															//Put all row contents in table
 					}
 				}
-        	}	
-		}	
+        	// }	
+		// }	
 		loadColors();
 		
 	</script>
@@ -200,7 +207,7 @@
 		background-attachment: fixed;
 		margin: 0;
 		width:100%;
-		min-height: 100%;
+		height: 100%;
 		text-shadow:2px 2px #000000;
 	}
 

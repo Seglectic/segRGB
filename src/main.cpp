@@ -10,7 +10,7 @@
  
 /****************************************************************************************************************************************************************
  *  
- *                                                          Libraries
+ *                                                          Libraries 📚
  *  
  ****************************************************************************************************************************************************************/ 
 
@@ -31,7 +31,7 @@
 
 /****************************************************************************************************************************************************************
  *  
- *                                                          Web Server File Handling
+ *                                                          Web Server File Handling 📂
  *  
  ****************************************************************************************************************************************************************/ 
 
@@ -74,12 +74,12 @@ bool handleFileRead(String path) {
 
 /****************************************************************************************************************************************************************
  *  
- *                                                      RGB LED GPIO Setup
+ *                                                      RGB LED GPIO Setup 🚥
  *  
  ****************************************************************************************************************************************************************/ 
 
 String LightMode = "colorSet";
-String Version = "0.7-OTA+";
+String Version = "0.8-OTA";
 
 //RGB Pins
 int rPin = 16;
@@ -141,7 +141,7 @@ void heatPulse(){
 
 /****************************************************************************************************************************************************************
  *  
- *                                                          NTP & Alarm Setup
+ *                                                          NTP & Alarm Setup ⏰
  *  
  ****************************************************************************************************************************************************************/ 
 
@@ -196,7 +196,7 @@ void alarmUpdate(){
 
 /****************************************************************************************************************************************************************
  * 
- *                                                        Web Response Handlers
+ *                                                        Web Response Handlers 👋
  *     
  ****************************************************************************************************************************************************************/ 
 
@@ -228,7 +228,7 @@ void handleGeneric() {
   server.send(200, "text/plain", response);                       // Respond to the HTTP request with plaintext
 }
 
-
+//Append color data received to file
 void saveColor(){
   String response = "Received save data\n__________________\n";
   
@@ -245,7 +245,7 @@ void saveColor(){
   }
 }
 
-
+//Load savedColors.txt and send via plainText
 void loadColors(){
   File load = SPIFFS.open("/savedColors.txt","r");                 // Load save file in read mode
   if(!load){Serial.println("failed to open save file");}           // Check if file opened
@@ -256,9 +256,14 @@ void loadColors(){
 
 void deleteColor(){
   File savedColors = SPIFFS.open("/savedColors.txt","r");                 // Load save file in read mode
-  
-  
   savedColors.close();
+}
+
+//Rebuild savedColors.txt when entry is deleted
+void colorData(){
+  String response = "Color data: \n";
+  response+=server.arg("data");
+  server.send(200,"text/plain",response);
 }
 
 
@@ -266,7 +271,7 @@ void deleteColor(){
  *
  * 
  *  
- *                                                          Main Setup
+ *                                                          Main Setup 🌱
  * 
  * 
  *  
@@ -309,6 +314,7 @@ void setup() {
   server.on("/loadColors",loadColors);
   server.on("/set",RGBSet);
   server.on("/version",getVersion);
+  server.on("/colorData",colorData);
   
   //Serves file to client
   server.onNotFound([]() {                                        // If the client requests any URI
@@ -335,7 +341,7 @@ void setup() {
  * 
  * 
  * 
- *                                                          Main Loop
+ *                                                          Main Loop ➰
  * 
  * 
  *  
